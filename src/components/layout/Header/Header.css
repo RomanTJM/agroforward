@@ -243,6 +243,13 @@
   }
 }
 
+.mobile-nav {
+  max-height: calc(100dvh - 70px);
+  overflow-y: auto;
+  overscroll-behavior: contain; /* prevent scroll bleed to page */
+  -webkit-overflow-scrolling: touch;
+}
+
 .mobile-nav .nav-link {
   color: var(--color-text-main) !important;
 }

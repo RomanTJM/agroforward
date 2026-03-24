@@ -24,6 +24,7 @@
 .csl-track {
   display: flex;
   will-change: transform;
+  touch-action: pan-y; /* allow vertical page scroll, capture horizontal swipe */
 }
 
 .csl-controls {
