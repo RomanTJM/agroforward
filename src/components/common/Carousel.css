@@ -19,11 +19,16 @@
 .csl-viewport {
   overflow: hidden;
   padding: 1rem 0 1.5rem;
+  touch-action: pan-y;
+  -webkit-user-drag: none;
 }
 
 .csl-track {
   display: flex;
   will-change: transform;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .csl-controls {

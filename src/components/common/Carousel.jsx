@@ -128,10 +128,17 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
             active = false;
             const dx = e.changedTouches[0].clientX - startX;
             if (Math.abs(dx) < 5 && Math.abs(vel) < 0.1) { snapTo(posRef.current, 0.35); return; }
-            const step   = cardWidthRef.current + GAP;
-            const slides = Math.round(-(dx + vel * 200) / step);
-            const speed  = Math.abs(vel);
-            const dur    = speed > 2 ? 0.28 : speed > 0.8 ? 0.38 : 0.48;
+
+            const step = cardWidthRef.current + GAP;
+            let slides = Math.round(-(dx + vel * 200) / step);
+            const threshold = Math.min(Math.max(step * 0.25, 50), 120); // короткий свайп до 25% ширины
+            if (slides === 0) {
+                if (Math.abs(dx) > threshold) slides = dx < 0 ? 1 : -1;
+                else if (Math.abs(vel) > 0.35) slides = vel < 0 ? 1 : -1;
+            }
+
+            const speed = Math.abs(vel);
+            const dur = speed > 2 ? 0.28 : speed > 0.8 ? 0.38 : 0.48;
             snapTo(posRef.current + slides, dur);
         };
 
@@ -201,10 +208,16 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
 
         if (Math.abs(dx) < 5 && Math.abs(v) < 0.1) { snapTo(posRef.current, 0.35); return; }
 
-        const step    = cardWidthRef.current + GAP;
-        const slides  = Math.round(-(dx + v * 200) / step);
-        const speed   = Math.abs(v);
-        const dur     = speed > 2 ? 0.28 : speed > 0.8 ? 0.38 : 0.48;
+        const step = cardWidthRef.current + GAP;
+        let slides = Math.round(-(dx + v * 200) / step);
+        const threshold = Math.min(Math.max(step * 0.25, 50), 120);
+        if (slides === 0) {
+            if (Math.abs(dx) > threshold) slides = dx < 0 ? 1 : -1;
+            else if (Math.abs(v) > 0.35) slides = v < 0 ? 1 : -1;
+        }
+
+        const speed = Math.abs(v);
+        const dur = speed > 2 ? 0.28 : speed > 0.8 ? 0.38 : 0.48;
         snapTo(posRef.current + slides, dur);
     };
 
