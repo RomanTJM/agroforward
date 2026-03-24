@@ -19,7 +19,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
     const visibleRef   = useRef(3);
     const peekRef      = useRef(52);
     const posRef       = useRef(n);
-    const dragRef      = useRef({ active: false, startX: 0, lastX: 0, lastT: 0, velocity: 0 });
+    const dragRef      = useRef({ active: false, cancelled: false, startX: 0, startY: 0, lastX: 0, lastT: 0, velocity: 0, pointerId: -1 });
 
     const updateActiveClasses = useCallback((p) => {
         cardsRef.current.forEach((card, idx) => {
@@ -84,29 +84,57 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
 
     const onPointerDown = (e) => {
         if (e.target.closest('button')) return;
-        dragRef.current = { active: true, startX: e.clientX, lastX: e.clientX, lastT: performance.now(), velocity: 0 };
-        applyTransform(getX(posRef.current));
-        trackRef.current?.setPointerCapture(e.pointerId);
+        // Don't capture or activate yet — wait for direction detection in onPointerMove
+        dragRef.current = {
+            active: false, cancelled: false,
+            startX: e.clientX, startY: e.clientY,
+            lastX: e.clientX, lastT: performance.now(),
+            velocity: 0, pointerId: e.pointerId,
+        };
         if (viewportRef.current) viewportRef.current.style.cursor = 'grabbing';
     };
 
     const onPointerMove = (e) => {
-        if (!dragRef.current.active) return;
+        const d = dragRef.current;
+        if (d.cancelled || d.pointerId < 0) return;
+
+        const dx = e.clientX - d.startX;
+        const dy = e.clientY - d.startY;
+
+        if (!d.active) {
+            // Haven't moved enough to determine direction yet
+            if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+
+            if (Math.abs(dx) >= Math.abs(dy)) {
+                // Horizontal swipe → start carousel drag
+                d.active = true;
+                trackRef.current?.setPointerCapture(d.pointerId);
+                applyTransform(getX(posRef.current));
+            } else {
+                // Vertical swipe → cancel drag, let page scroll
+                d.cancelled = true;
+                if (viewportRef.current) viewportRef.current.style.cursor = 'grab';
+                return;
+            }
+        }
+
         const now = performance.now();
-        const dt  = now - dragRef.current.lastT;
-        if (dt > 0) dragRef.current.velocity = (e.clientX - dragRef.current.lastX) / dt;
-        dragRef.current.lastX = e.clientX;
-        dragRef.current.lastT = now;
-        applyTransform(getX(posRef.current) + (e.clientX - dragRef.current.startX));
+        const dt  = now - d.lastT;
+        if (dt > 0) d.velocity = (e.clientX - d.lastX) / dt;
+        d.lastX = e.clientX;
+        d.lastT = now;
+        applyTransform(getX(posRef.current) + dx);
     };
 
     const onPointerUp = (e) => {
-        if (!dragRef.current.active) return;
-        dragRef.current.active = false;
+        const d = dragRef.current;
         if (viewportRef.current) viewportRef.current.style.cursor = 'grab';
+        dragRef.current = { active: false, cancelled: false, startX: 0, startY: 0, lastX: 0, lastT: 0, velocity: 0, pointerId: -1 };
 
-        const dx    = e.clientX - dragRef.current.startX;
-        const v     = dragRef.current.velocity;
+        if (!d.active) return;
+
+        const dx = e.clientX - d.startX;
+        const v  = d.velocity;
 
         if (Math.abs(dx) < 5 && Math.abs(v) < 0.1) {
             snapTo(posRef.current, 0.35);
@@ -144,7 +172,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
                             key={idx}
                             ref={el => { cardsRef.current[idx] = el; }}
                             className={cardClass}
-                            style={{ flex: `0 0 ${cardWidth}px`, minWidth: `${cardWidth}px`, touchAction: 'pan-y' }}
+                            style={{ flex: `0 0 ${cardWidth}px`, minWidth: `${cardWidth}px` }}
                         >
                             {renderCard(item, idx % n)}
                         </div>
