@@ -19,6 +19,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
     const visibleRef   = useRef(3);
     const peekRef      = useRef(52);
     const posRef       = useRef(n);
+    // Mouse drag state (pointer events, desktop only)
     const dragRef      = useRef({ active: false, cancelled: false, startX: 0, startY: 0, lastX: 0, lastT: 0, velocity: 0, pointerId: -1 });
 
     const updateActiveClasses = useCallback((p) => {
@@ -82,9 +83,73 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         return () => ro.disconnect();
     }, [measure]);
 
+    // ── Native touch events (mobile) ──────────────────────────────────────
+    useEffect(() => {
+        const track = trackRef.current;
+        if (!track) return;
+
+        let startX = 0, startY = 0, lastX = 0, lastT = 0, vel = 0, active = false, locked = false;
+
+        const onTouchStart = (e) => {
+            if (e.target.closest('button')) return;
+            const t = e.touches[0];
+            startX = t.clientX; startY = t.clientY;
+            lastX = startX; lastT = performance.now();
+            vel = 0; active = false; locked = false;
+        };
+
+        const onTouchMove = (e) => {
+            if (locked) return;                          // vertical — let page scroll
+            const t  = e.touches[0];
+            const dx = t.clientX - startX;
+            const dy = t.clientY - startY;
+
+            if (!active) {
+                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;  // wait for clear intent
+                if (Math.abs(dx) >= Math.abs(dy)) {
+                    active = true;                       // horizontal — take over
+                    applyTransform(getX(posRef.current));
+                } else {
+                    locked = true;                       // vertical — ignore the rest
+                    return;
+                }
+            }
+
+            e.preventDefault();                          // stop page scroll while dragging
+            const now = performance.now();
+            const dt  = now - lastT;
+            if (dt > 0) vel = (t.clientX - lastX) / dt;
+            lastX = t.clientX; lastT = now;
+            applyTransform(getX(posRef.current) + dx);
+        };
+
+        const onTouchEnd = (e) => {
+            if (!active) return;
+            active = false;
+            const dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) < 5 && Math.abs(vel) < 0.1) { snapTo(posRef.current, 0.35); return; }
+            const step   = cardWidthRef.current + GAP;
+            const slides = Math.round(-(dx + vel * 200) / step);
+            const speed  = Math.abs(vel);
+            const dur    = speed > 2 ? 0.28 : speed > 0.8 ? 0.38 : 0.48;
+            snapTo(posRef.current + slides, dur);
+        };
+
+        track.addEventListener('touchstart', onTouchStart, { passive: true });
+        track.addEventListener('touchmove',  onTouchMove,  { passive: false }); // passive:false needed for preventDefault
+        track.addEventListener('touchend',   onTouchEnd,   { passive: true });
+
+        return () => {
+            track.removeEventListener('touchstart', onTouchStart);
+            track.removeEventListener('touchmove',  onTouchMove);
+            track.removeEventListener('touchend',   onTouchEnd);
+        };
+    }, [applyTransform, getX, snapTo]);
+
+    // ── Pointer events (mouse / desktop only) ─────────────────────────────
     const onPointerDown = (e) => {
+        if (e.pointerType === 'touch') return;           // touch handled above
         if (e.target.closest('button')) return;
-        // Don't capture or activate yet — wait for direction detection in onPointerMove
         dragRef.current = {
             active: false, cancelled: false,
             startX: e.clientX, startY: e.clientY,
@@ -95,6 +160,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
     };
 
     const onPointerMove = (e) => {
+        if (e.pointerType === 'touch') return;
         const d = dragRef.current;
         if (d.cancelled || d.pointerId < 0) return;
 
@@ -102,16 +168,12 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         const dy = e.clientY - d.startY;
 
         if (!d.active) {
-            // Haven't moved enough to determine direction yet
             if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
-
             if (Math.abs(dx) >= Math.abs(dy)) {
-                // Horizontal swipe → start carousel drag
                 d.active = true;
                 trackRef.current?.setPointerCapture(d.pointerId);
                 applyTransform(getX(posRef.current));
             } else {
-                // Vertical swipe → cancel drag, let page scroll
                 d.cancelled = true;
                 if (viewportRef.current) viewportRef.current.style.cursor = 'grab';
                 return;
@@ -127,6 +189,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
     };
 
     const onPointerUp = (e) => {
+        if (e.pointerType === 'touch') return;
         const d = dragRef.current;
         if (viewportRef.current) viewportRef.current.style.cursor = 'grab';
         dragRef.current = { active: false, cancelled: false, startX: 0, startY: 0, lastX: 0, lastT: 0, velocity: 0, pointerId: -1 };
@@ -136,16 +199,12 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         const dx = e.clientX - d.startX;
         const v  = d.velocity;
 
-        if (Math.abs(dx) < 5 && Math.abs(v) < 0.1) {
-            snapTo(posRef.current, 0.35);
-            return;
-        }
+        if (Math.abs(dx) < 5 && Math.abs(v) < 0.1) { snapTo(posRef.current, 0.35); return; }
 
         const step    = cardWidthRef.current + GAP;
         const slides  = Math.round(-(dx + v * 200) / step);
         const speed   = Math.abs(v);
         const dur     = speed > 2 ? 0.28 : speed > 0.8 ? 0.38 : 0.48;
-
         snapTo(posRef.current + slides, dur);
     };
 
@@ -155,11 +214,11 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
                 <div className="csl-hint"><span>{hint}</span></div>
             )}
 
-            <div className="csl-viewport" ref={viewportRef} style={{ cursor: 'grab', touchAction: 'pan-y' }}>
+            <div className="csl-viewport" ref={viewportRef} style={{ cursor: 'grab' }}>
                 <div
                     ref={trackRef}
                     className="csl-track"
-                    style={{ gap: `${GAP}px`, touchAction: 'pan-y' }}
+                    style={{ gap: `${GAP}px` }}
                     onPointerDown={onPointerDown}
                     onPointerMove={onPointerMove}
                     onPointerUp={onPointerUp}
