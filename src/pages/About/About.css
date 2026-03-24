@@ -311,14 +311,16 @@
   transition: transform var(--transition-smooth);
 }
 
-.value-card--active:hover {
-  transform: translateY(-4px) scale(1);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(4,82,58,0.1);
-}
+@media (hover: hover) {
+  .value-card--active:hover {
+    transform: translateY(-4px) scale(1);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(4,82,58,0.1);
+  }
 
-.value-card--active:hover::before {
-  transform: scaleY(1);
+  .value-card--active:hover::before {
+    transform: scaleY(1);
+  }
 }
 
 .value-card h3 {

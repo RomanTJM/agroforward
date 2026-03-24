@@ -111,14 +111,15 @@
   transition: opacity var(--transition-smooth);
 }
 
-.adv-card--active:hover {
-  transform: translateY(-7px) scale(1);
-  box-shadow: var(--shadow-xl);
-  border-color: rgba(4,82,58,0.1);
-}
-
-.adv-card--active:hover::before {
-  opacity: 2;
+@media (hover: hover) {
+  .adv-card--active:hover {
+    transform: translateY(-7px) scale(1);
+    box-shadow: var(--shadow-xl);
+    border-color: rgba(4,82,58,0.1);
+  }
+  .adv-card--active:hover::before {
+    opacity: 2;
+  }
 }
 
 .adv-icon {
@@ -134,9 +135,11 @@
   transition: all var(--transition-smooth);
 }
 
-.adv-card:hover .adv-icon {
-  background: linear-gradient(135deg, rgba(213,97,84,0.18) 0%, rgba(213,97,84,0.08) 100%);
-  transform: scale(1.08) rotate(-3deg);
+@media (hover: hover) {
+  .adv-card:hover .adv-icon {
+    background: linear-gradient(135deg, rgba(213,97,84,0.18) 0%, rgba(213,97,84,0.08) 100%);
+    transform: scale(1.08) rotate(-3deg);
+  }
 }
 
 .adv-icon svg {
@@ -253,14 +256,15 @@
   transform: scale(1);
 }
 
-.strat-card--active:hover {
-  transform: translateY(-6px) scale(1);
-  box-shadow: var(--shadow-xl);
-  border-color: rgba(4,82,58,0.12);
-}
-
-.strat-card--active:hover .strat-number {
-  opacity: 0.12;
+@media (hover: hover) {
+  .strat-card--active:hover {
+    transform: translateY(-6px) scale(1);
+    box-shadow: var(--shadow-xl);
+    border-color: rgba(4,82,58,0.12);
+  }
+  .strat-card--active:hover .strat-number {
+    opacity: 0.12;
+  }
 }
 
 .strat-number {

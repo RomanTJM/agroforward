@@ -160,13 +160,13 @@ const Header = () => {
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
-                        className="mobile-nav"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
                         style={{ overflow: 'hidden', backgroundColor: 'var(--color-bg-white)', boxShadow: 'var(--shadow-md)' }}
                     >
+                        <div className="mobile-nav">
                         <div className="container" style={{ padding: '1.5rem 2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             {navItems.map((item) => (
                                 <div key={item.path}>
@@ -201,6 +201,7 @@ const Header = () => {
                             <Link to="/contacts" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} onClick={() => setMobileMenuOpen(false)}>
                                 Связаться
                             </Link>
+                        </div>
                         </div>
                     </motion.div>
                 )}

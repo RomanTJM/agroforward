@@ -127,11 +127,11 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
                 <div className="csl-hint"><span>{hint}</span></div>
             )}
 
-            <div className="csl-viewport" ref={viewportRef} style={{ cursor: 'grab' }}>
+            <div className="csl-viewport" ref={viewportRef} style={{ cursor: 'grab', touchAction: 'pan-y' }}>
                 <div
                     ref={trackRef}
                     className="csl-track"
-                    style={{ gap: `${GAP}px` }}
+                    style={{ gap: `${GAP}px`, touchAction: 'pan-y' }}
                     onPointerDown={onPointerDown}
                     onPointerMove={onPointerMove}
                     onPointerUp={onPointerUp}
@@ -144,7 +144,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
                             key={idx}
                             ref={el => { cardsRef.current[idx] = el; }}
                             className={cardClass}
-                            style={{ flex: `0 0 ${cardWidth}px`, minWidth: `${cardWidth}px` }}
+                            style={{ flex: `0 0 ${cardWidth}px`, minWidth: `${cardWidth}px`, touchAction: 'pan-y' }}
                         >
                             {renderCard(item, idx % n)}
                         </div>
