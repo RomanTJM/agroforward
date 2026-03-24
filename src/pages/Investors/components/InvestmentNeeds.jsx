@@ -31,7 +31,7 @@ const InvestmentNeeds = () => (
                 className="invest-header"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
             >
                 <div className="invest-badge"><Calendar size={14} /> Календарь инвестора</div>
                 <h2>Инвестиционные потребности</h2>
@@ -42,7 +42,7 @@ const InvestmentNeeds = () => (
                 className="return-metrics"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                 transition={{ delay: 0.1 }}
             >
                 {returnMetrics.map((m, i) => (
@@ -60,7 +60,7 @@ const InvestmentNeeds = () => (
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                     transition={{ delay: 0.15 }}
                 >
                     <h3 className="invest-col-title">Направления финансирования</h3>
@@ -71,7 +71,7 @@ const InvestmentNeeds = () => (
                                 className="invest-item"
                                 initial={{ opacity: 0, x: -16 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                                 transition={{ delay: 0.1 + i * 0.07 }}
                             >
                                 <div className="invest-item-icon">{item.icon}</div>
@@ -87,7 +87,7 @@ const InvestmentNeeds = () => (
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                     transition={{ delay: 0.2 }}
                 >
                     <h3 className="invest-col-title">Дорожная карта развития</h3>

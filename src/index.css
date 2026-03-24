@@ -215,6 +215,21 @@ h3 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); }
   color: var(--color-accent);
 }
 
+.feature-card,
+.doc-card-rich,
+.team-card,
+.chart-container,
+.invest-header,
+.return-metrics,
+.invest-item,
+.section-head,
+.team-grid {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
 .section-divider {
   width: 60px;
   height: 4px;

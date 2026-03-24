@@ -16,7 +16,7 @@ const Features = ({ features }) => (
                         className="feature-card"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-50px" }}
+                        viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                         transition={{ delay: idx * 0.1 + 0.2 }}
                         whileHover={{ y: -5, boxShadow: "var(--shadow-md)" }}
                     >

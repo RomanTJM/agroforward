@@ -14,7 +14,7 @@ const TeamSection = () => (
                     className="team-card"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                 >
                     <div className="team-image-wrapper">
                         <img src={generalManager} alt="Генеральный директор" className="team-photo" />
@@ -30,7 +30,7 @@ const TeamSection = () => (
                     className="team-card"
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                 >
                     <div className="team-image-wrapper">
                         <img src={commercialDirector} alt="Коммерческий директор" className="team-photo" />

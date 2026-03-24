@@ -19,7 +19,6 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
     const visibleRef   = useRef(3);
     const peekRef      = useRef(52);
     const posRef       = useRef(n);
-    // Mouse drag state (pointer events, desktop only)
     const dragRef      = useRef({ active: false, cancelled: false, startX: 0, startY: 0, lastX: 0, lastT: 0, velocity: 0, pointerId: -1 });
 
     const updateActiveClasses = useCallback((p) => {
@@ -83,7 +82,6 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         return () => ro.disconnect();
     }, [measure]);
 
-    // ── Native touch events (mobile) ──────────────────────────────────────
     useEffect(() => {
         const track = trackRef.current;
         if (!track) return;
@@ -99,23 +97,23 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         };
 
         const onTouchMove = (e) => {
-            if (locked) return;                          // vertical — let page scroll
+            if (locked) return;                          
             const t  = e.touches[0];
             const dx = t.clientX - startX;
             const dy = t.clientY - startY;
 
             if (!active) {
-                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;  // wait for clear intent
+                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;  
                 if (Math.abs(dx) >= Math.abs(dy)) {
-                    active = true;                       // horizontal — take over
+                    active = true;                       
                     applyTransform(getX(posRef.current));
                 } else {
-                    locked = true;                       // vertical — ignore the rest
+                    locked = true;                       
                     return;
                 }
             }
 
-            e.preventDefault();                          // stop page scroll while dragging
+            e.preventDefault();                          
             const now = performance.now();
             const dt  = now - lastT;
             if (dt > 0) vel = (t.clientX - lastX) / dt;
@@ -131,7 +129,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
 
             const step = cardWidthRef.current + GAP;
             let slides = Math.round(-(dx + vel * 200) / step);
-            const threshold = Math.min(Math.max(step * 0.25, 50), 120); // короткий свайп до 25% ширины
+            const threshold = Math.min(Math.max(step * 0.25, 50), 120); 
             if (slides === 0) {
                 if (Math.abs(dx) > threshold) slides = dx < 0 ? 1 : -1;
                 else if (Math.abs(vel) > 0.35) slides = vel < 0 ? 1 : -1;
@@ -143,7 +141,7 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         };
 
         track.addEventListener('touchstart', onTouchStart, { passive: true });
-        track.addEventListener('touchmove',  onTouchMove,  { passive: false }); // passive:false needed for preventDefault
+        track.addEventListener('touchmove',  onTouchMove,  { passive: false }); 
         track.addEventListener('touchend',   onTouchEnd,   { passive: true });
 
         return () => {
@@ -153,9 +151,8 @@ const Carousel = ({ items, renderCard, cardClass, activeClass, hint }) => {
         };
     }, [applyTransform, getX, snapTo]);
 
-    // ── Pointer events (mouse / desktop only) ─────────────────────────────
     const onPointerDown = (e) => {
-        if (e.pointerType === 'touch') return;           // touch handled above
+        if (e.pointerType === 'touch') return;           
         if (e.target.closest('button')) return;
         dragRef.current = {
             active: false, cancelled: false,

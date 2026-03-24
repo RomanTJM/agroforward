@@ -10,7 +10,7 @@ const CTA = () => (
                 className="cta-content"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
                 transition={{ duration: 0.6 }}
             >
                 <h2>Готовы начать <span className="text-accent underline underline-offset-8">сотрудничество?</span></h2>

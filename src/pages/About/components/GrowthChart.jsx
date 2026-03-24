@@ -15,7 +15,7 @@ const GrowthChart = ({ data }) => (
                 className="chart-container"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.35, margin: "-20% 0px -20% 0px" }}
             >
                 <ResponsiveContainer width="100%" height={400}>
                     <AreaChart data={data} margin={{ top: 10, right: 15, left: 15, bottom: 0 }}>
